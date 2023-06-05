@@ -132,7 +132,8 @@ from sklearn.datasets import make_classification
 def make_class_dataset(_n_samples=1000, n_feat=100,n_inf=10,n_red=0, n_rep=0, n_clas =6,
         class_sepr=0.8,seed=42):
     '''
-    create a dataset to check the importance of the feature.
+    create a dataset to check the importance of the feature. It is creating a dataset where the
+    ground truth is known 
     it takes as parameters the make_classification parameters (the scikit-learn function)
     and then it returns X, y dataset (X a pandas dataframe, y array of classes)
     c  is the feature importance (obtained using logistic regression and adding a bias weight)
@@ -184,4 +185,70 @@ def make_class_dataset(_n_samples=1000, n_feat=100,n_inf=10,n_red=0, n_rep=0, n_
         
     return X, y, c
         
-   
+ def constrain_dataset(_n_samples=1000, n_feat=100,n_inf=10,n_red=0, n_rep=0, n_clas =6,
+        class_sepr=0.8,seed=42, criterion = 'type_1', pathways= 20, pathway_inf = 0.5, 
+                     pathway_red = 0.3):
+    '''
+    check parameters from make_class_dataset
+    this is the extension to use with contrain nets
+    criterion: control the connection between the features
+        type_1: each type of features is connected only by themselves (ex: informative features
+                are connected only with other informative features, but not with redundant ot
+                uninformative) -- Default
+        type_2: informative and redundant are connected between themselves, but not with 
+                uninformative
+        type_3: random connections
+    pathways = control the number of group (neurons in the the next layer)
+    pathway_inf = percentage of pathways connected to informative features
+    pathway_red = percentage of pathways connected to redundant features
+    return:
+    create a dataset to check the importance of the feature.
+    it takes as parameters the make_classification parameters (the scikit-learn function)
+    and then it returns X, y dataset (X a pandas dataframe, y array of classes)
+    c  is the feature importance (obtained using logistic regression and adding a bias weight)
+    go a matrix controlling the interaction between features
+    Usage example
+        X, y, c, go = constrain_dataset()
+    
+    '''
+    
+    X, y, c = make_class_dataset(_n_samples=_n_samples, n_feat=n_feat,n_inf=n_inf,n_red=n_red, 
+                       n_rep=n_rep, n_clas =n_clas,class_sepr=class_sepr,seed=seed)
+    
+    if criterion == 'type_1':
+        
+        if n_red is not 0:
+            pathway_inf = int(pathways * pathway_inf)
+            pathway_red = int(pathways * pathway_red)
+            _go =np.random.randint(1, size=(n_feat, pathways))
+            _go[:n_inf, :pathway_inf] = np.random.randint(2, size=(n_inf, pathway_inf))
+            _go[n_inf:(n_inf+n_red), pathway_inf:(pathway_inf+ pathway_red)] = \
+            np.random.randint(2, size=(n_red, pathway_red))
+            _go[(n_inf+n_red):, (pathway_inf+ pathway_red):] = \
+            np.random.randint(2, size=((n_feat-(n_inf+ n_red) ), 
+                                       (pathways-(pathway_inf + pathway_red) ) ))
+            
+        else:
+            pathway_inf = int(pathways * pathway_inf)
+
+            _go =np.random.randint(1, size=(n_feat, pathways))
+            _go[:n_inf, :pathway_inf] = np.random.randint(2, size=(n_inf, pathway_inf))
+            _go[n_inf:, pathway_inf:] = np.random.randint(2, size=((n_feat-n_inf), 
+                                                                   (pathways-pathway_inf) ))
+        
+    if criterion == 'type_2':
+            pathway_inf = int(pathways * pathway_inf)
+            pathway_red = int(pathways * pathway_red)
+            path_inf_red =pathway_inf + pathway_red
+            n_inf_red = n_inf +n_red
+            _go =np.random.randint(1, size=(n_feat, pathways))
+            _go[:n_inf_red, :path_inf_red] = np.random.randint(2, size=(n_inf_red, path_inf_red))
+            _go[n_inf_red:, path_inf_red:] = np.random.randint(2, size=((n_feat-n_inf_red), 
+                                                                   (pathways-path_inf_red) ))
+            
+    if criterion == 'type_3':
+            _go =np.random.randint(2, size=(n_feat, pathways))
+        
+    
+    return X, y, c, _go
+      
