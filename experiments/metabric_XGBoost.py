@@ -25,9 +25,9 @@ sys.path.insert(0, "/home/sraieli/py_script/pnet/")
 
 import toy_datasets, tf_layer, tools, matrixes
 from matrixes import concat_go_matrix
-from tools import keras_cat, history_plot, splitting_data, list_avg_gene, list_avg_path
-from tools import list_avg_path2, compare_nets, plot_result
-from tf_layer import LinearGO, Linear_dataloop, Linear_dataloop1, attention
+from tools import keras_cat, history_plot, splitting_data
+from tf_layer import LinearGO,  attention
+
 
 
 
@@ -75,6 +75,15 @@ go = go.sort_values("genes")
 df2, go2 = genes_go_matrix(gene_df = df2, gene_pat = go, filt_mat = None, 
                    min_max_gene = [10,200], pat_num = 1)
 
+#concat exome rnaseq
+my_dir = "/home/sraieli/dataset/filesforNNarch/filesforNNarch/"
+
+csv_go = pd.read_csv(my_dir + "go_level.csv", index_col=0)
+go = pd.read_csv("/home/sraieli/dataset/filesforNNarch/filesforNNarch/GOpath_matrix.txt", sep = "\t")
+go = go.sort_values("genes")
+
+concat, adj_gene, go2= concat_go_matrix(expr = df3, exo_df = cna2, gene_pats =go, filt_mats = None, 
+                       min_max_genes = [10,200], pat_nums = 1)
 
 #### XGBoost 
 start_time = time.time()
