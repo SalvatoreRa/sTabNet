@@ -223,7 +223,40 @@ def splitting_data( data_x = None, data_y = None, val_split = 0.1, test_split = 
     
     return _X_train, _X_test, _X_val, _y_train_enc, _y_val_enc, _y_test_enc
     
+ 
+   
+def classification_metrics(_X_test = None, _model = None, _y_test = None, nn= True):
+    '''
+    simple wrapper for getting all the classification metrics
     
+    ---
+    example of usage:
+    classification_metrics(_X_test = X_test, _model = model_go, _y_test = y_test_enc, nn= True)
+    classification_metrics(_X_test = X_test, _model = model, _y_test = y_test, nn= False)
+    '''
+    if nn:
+        preds = _model.predict(_X_test)  
+        y_preds = np.argmax(preds, axis = 1)
+        predictions = preds[:, 1]
+        _y_test =_y_test[:,1]
+        
+    else:
+        y_preds = _model.predict(_X_test)
+        predictions = _model.predict_proba(X_test)[:, 1]
+        
+        
+    m =  [] 
+    ms = [accuracy_score, matthews_corrcoef, cohen_kappa_score, balanced_accuracy_score, 
+              precision_score, recall_score, f1_score ] 
+    for i in range(len(ms)):
+        m.append(ms[i](_y_test, y_preds))
 
+    m.append(roc_auc_score(_y_test,predictions))
+    m.append(average_precision_score(_y_test, predictions))
+
+    tn, fp, fn, tp = confusion_matrix(_y_test, y_preds).ravel()
+    m.append(tn / (tn+fp))
+    m.append(tp / (tp+fn))
+    return m
 
 
