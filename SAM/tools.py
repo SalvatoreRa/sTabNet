@@ -102,7 +102,35 @@ def recovery_weight(_layer  = None, annot = False, path_mat= None):
         
     return _w, _b, _wm
 
-
+def list_avg_gene(_dir = None, _file = None, _n =20, y= 'genes'):
+    '''
+    return the plot of the top20 in absolute value, the csv with the average
+    INPUT
+    _dir = where to load and to save the file
+    _file = the file where are stored data from a loop
+    _N = numbero of genes to plot
+    y = is for the column names for plotting, default is "genes" for genes
+    OUTPUT
+    bar plot
+    csv with genes and average
+    EXAMPLE USAGE
+    list_avg_gene(_file_dir = "/home/sraieli/test/go_test/", 
+              _file = "goconcat_net2_genes_mut.csv", _n =20)
+    list_avg_gene(_dir =  "/home/sraieli/test/path_test/", 
+              _file = "goconcat_net4_path.csv", _n =20, y = "pathway")
+    '''
+    _df = pd.read_csv(_dir + _file,  index_col=0)
+    _df1 = _df.dropna(thresh=2)
+    _df1["avg"] = _df1.iloc[:,1:_df1.shape[1]].mean(axis= 1)
+    _df1 =_df1.reindex(_df1.avg.abs().sort_values(ascending=False).index)
+    _df2 = _df1.iloc[0:_n,:].copy()
+    ax = sns.barplot(data = _df2, x = 'avg', y = y)
+    fig = ax.get_figure()
+    _f = _file.split(".csv")
+    fig.savefig(_dir +_f[0] +"_top_" + str(_n) + ".png", dpi = 300, bbox_inches='tight') 
+    plt.close()
+    _df2 = _df1[[y, "avg"]]
+    _df2.to_csv(_dir +_f[0] + "_avg.csv")
 
 def plot_weights(weights = None, n = 10):
     '''
