@@ -265,5 +265,102 @@ def classification_metrics(_X_test = None, _model = None, _y_test = None, nn= Tr
     m.append(tn / (tn+fp))
     m.append(tp / (tp+fn))
     return m
+    
+
+import networkx as nx
+def random_walk(graph:nx.Graph, node:int, steps:int = 4, p:float=1.0, q:float=1.0):
+   """  
+   perform a Node2vec random walk for a node in a graph.
+   Node2vec random walk is an extension of the random walk, where parameter p and q controls the 
+   exploration of local versus a more wide esploration (Breath first versus deep first search)
+   code adapted from: https://keras.io/examples/graph/node2vec_movielens/
+   
+   Parameter
+   graph: networkx graph
+   p: return parameter, control the likelihood to visit again a node. low value keep local
+   q: in-out parameter, inward/outwards node balance; high value local, low value exploration
+   node = node in the networkx graph to start the randomwalk
+   steps: number of steps
+   Return:
+   rw: random walk
+   
+   notes:
+   this code works also with isolate nodes, for isolates node, return a random walk of 1, where
+   the isolate node is the only node present
+   
+   example usage:
+   rw = random_walk(graph, node, steps, p, q)
+   rw = random_walk(G, 0, 4, 1.0, 1.0)
+      
+   
+   """
+
+   if nx.is_isolate(G, node):
+        rw = [str(node)]
+   else:
+       rw = [str(node),]
+       start_node = node
+       for _ in range(steps):
+          weights = []
+          neighbors = list(nx.all_neighbors(graph, start_node))
+          for neigh in neighbors:
+            if str(neigh) == rw[-1]:
+                # Control the probability to return to the previous node.
+                weights.append(1/ p)
+            elif graph.has_edge(neigh,rw[-1]):
+                # The probability of visiting a local node.
+                weights.append(1)
+            else:
+                # Control the probability to move forward.
+                weights.append(1 / q)
+
+          # we transform the probability to 1
+          weight_sum = sum(weights)
+          probabilities = [weight / weight_sum for weight in weights]
+          walking_node = np.random.choice(neighbors, size=1, p=probabilities)[0]
+          rw.append(str(walking_node))
+          start_node= walking_node
+   return rw
+
+def get_paths(graph:nx.Graph, rws= 10, steps = 4, p=1.0, q=1.0):
+   """  
+   perform a set of random walks in a networkx graph
+   this function is a simple wrapper to perform a set of random walks in a graph
+   
+   parameters:
+   graph: a networkx graph
+   rws: number of randomwalks performed for each node (ex: 5, five random walk starting from each node
+   will be performed)
+   steps: number of steps (visited node) for each random walks
+   p: return parameter, control the likelihood to visit again a node. low value keep local
+   q: in-out parameter, inward/outwards node balance; high value local, low value exploration
+   return:
+   a list of random walks
+   
+   """
+   paths = []
+   for node in graph.nodes():
+     for _ in range(rws):
+         paths.append(random_walk(graph, node, steps, p, q))
+   return paths
+
+def mapping_rw(rws=None, features=None):
+    """mapping clustering labels to a membership matrix
+    this is generating the sparse matrix that will be used in the modfied layer
+    input
+    rws = a list of random walks (as list of list
+    features = list of original features
+    output
+    a panda dataframe where each feature is mapped to the cluster it belongs
+    example usage:
+    go = mapping_rw(rws=random_walks, features=data.columns.to_list())
+    """
+    rw_list = [i for i in range(len(random_walks))]
+    A = pd.DataFrame(0, columns=rw_list, index=features)
+    for i in range(len(random_walks)):
+        rw = list(map(int, random_walks[i]))
+        for j in rw:
+            A.loc[features[j],i] = 1
+    return A
 
 
