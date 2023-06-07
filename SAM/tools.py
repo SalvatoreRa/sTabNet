@@ -346,7 +346,6 @@ def get_paths(graph:nx.Graph, rws= 10, steps = 4, p=1.0, q=1.0):
 
 def mapping_rw(rws=None, features=None):
     """mapping clustering labels to a membership matrix
-    this is generating the sparse matrix that will be used in the modfied layer
     input
     rws = a list of random walks (as list of list
     features = list of original features
@@ -355,10 +354,10 @@ def mapping_rw(rws=None, features=None):
     example usage:
     go = mapping_rw(rws=random_walks, features=data.columns.to_list())
     """
-    rw_list = [i for i in range(len(random_walks))]
+    rw_list = [i for i in range(len(rws))]
     A = pd.DataFrame(0, columns=rw_list, index=features)
     for i in range(len(random_walks)):
-        rw = list(map(int, random_walks[i]))
+        rw = list(map(int, rws[i]))
         for j in rw:
             A.loc[features[j],i] = 1
     return A
