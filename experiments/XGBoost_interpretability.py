@@ -61,7 +61,8 @@ for p in sep_diff:
     
     # CREATE DATASET AND FEATURE IMPORTANCE
     class_sep = p
-    # create classification, function from scikit-learn
+    # create classification dataset, function from scikit-learn
+    #dataset with 1000 examples,10 informative features and 90 non-informative
     X, y = make_classification(
         n_samples=1000,
         n_features=n_feat,
