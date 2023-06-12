@@ -59,7 +59,8 @@ for p in sep_diff:
     
     # CREATE DATASET AND FEATURE IMPORTANCE
     class_sep = p
-    
+    # classification as for the XGBoost classifier
+    # 1000 examples, 10 informative, 90 non-informative features
     X, y = make_classification(
         n_samples=1000,
         n_features=n_feat,
@@ -82,14 +83,8 @@ for p in sep_diff:
     
 
 
-    clf = LogisticRegression(random_state=0).fit(X.iloc[:,:n_inf], y)
-    c_inf = np.sum(np.abs(clf.coef_), axis=0)
-    c_inf = NormalizeData(c_inf) +10
-    clf = LogisticRegression(random_state=0).fit(X.iloc[:,n_inf:], y)
-    c_noise = np.sum(np.abs(clf.coef_), axis=0)
-    c_noise = NormalizeData(c_noise)
-    c =list(c_inf) + list(c_noise)
-    
+
+    #100 splits for each separation coefficient p
     for i in range(n):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, 
                                                                 random_state=i, stratify = y)
@@ -103,7 +98,7 @@ for p in sep_diff:
         X_test = scaler.transform(X_test)
 
 
-            #y_val[:5], y_val_enc[:5], y_train[:5],  y_train_enc[:5]
+            
 
         model = xgb.XGBClassifier(objective='multi:softmax', random_state=i)
         model.fit(X_train, y_train)
@@ -119,16 +114,12 @@ for p in sep_diff:
         results.loc[i, "Weighted precision"] = precision_score(y_test, y_pred, average='weighted')
         results.loc[i, "Weighted recall"] = recall_score(y_test, y_pred, average='weighted')
         results.loc[i, "Weighted F1 score"] = f1_score(y_test, y_pred, average='weighted')
-        results.loc[i, "c_index"] =concordance_index(c, model.feature_importances_)
-        results.loc[i, "c_ind_inf"] =concordance_index(c[:n_inf], model.feature_importances_[:n_inf])
-        #results.loc[i, "c_ind_red"] =concordance_index(c[n_inf:(n_inf+n_red)],
-        #                                               model.feature_importances_[n_inf:(n_inf+n_red)])
-        results.loc[i, "c_ind_Ninf"] =concordance_index(c[n_inf:], 
-                                                       model.feature_importances_[n_inf:])
-        results.loc[i, "c_ratio"] =np.sum(model.feature_importances_[:n_inf]) / np.sum(model.feature_importances_[n_inf:])
+        
         feat_imp.loc[:,i] = model.feature_importances_
         
         #SHAP
+        # SHAP value is calculated for each trained model
+        # code adapted from the official tutorials in the library
         explainer=shap.Explainer(model)
         shap_values = explainer(pd.DataFrame(X_test, columns =X.columns))
         vals = np.abs(shap_values.values).mean(0)
@@ -137,15 +128,13 @@ for p in sep_diff:
         shap_importance = pd.DataFrame(list(zip(feature_names, vals)), columns=['col_name', 'feature_importance_vals'])
         #shap_importance.sort_values(by=['col_name'], ascending=True, inplace=True)
         sh =shap_importance.feature_importance_vals.to_list()
-        c_index_sh =concordance_index(c, sh)
-        c_ratio_sh =np.sum(sh[:n_inf]) / np.sum(sh[n_inf:])
-        results.loc[i, "c_index_sh"], results.loc[i, "c_ratio_sh"] = c_index_sh, c_ratio_sh
+        
         SHAP_imp.loc[:,i] = sh
         
-    res_dir = './SHAP/'
+    res_dir = './results/'
         
-    results.to_csv(res_dir+ 'results_XGBoost_inf+' + str(p) +'.csv')
-    feat_imp.to_csv(res_dir+ 'feat_imp_XGBoost_inf+' + str(p) +'.csv')
+    results.to_csv(res_dir+ 'SHAP_results_XGBoost_inf+' + str(p) +'.csv')
+    feat_imp.to_csv(res_dir+ 'SHAP_feat_imp_XGBoost_inf+' + str(p) +'.csv')
     SHAP_imp.to_csv(res_dir+ 'SHAP_imp_XGBoost_inf+' + str(p) +'.csv')
         
     feat_imp['col_feat'] = feat_imp.index
