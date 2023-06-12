@@ -284,7 +284,7 @@ results = pd.DataFrame(index = split_i, columns = measures)
 
 X, y, c, go = constrain_dataset(_n_samples=1000, n_feat=100,n_inf=10,n_red=0, n_rep=0, 
                                     n_clas =6, class_sepr=class_sep,seed=42, criterion = 'type_1', 
-                                    pathways= 100, pathway_inf = 0.9, pathway_red = 0)
+                                    pathways= 100, pathway_inf = 0.5, pathway_red = 0)
 
 for i in range(n):
         X_train, X_test, X_val, y_train_enc, y_val_enc, y_test_enc =splitting_data( data_x = X, 
@@ -293,6 +293,8 @@ for i in range(n):
                                                                             test_split = 0.2,
                                                                             random_seed =n)
 
+        # simple architecture with an attention layer, a sparse layer, regularization and another layer
+        # training objective is multi-class classification
         inputs = keras.layers.Input(shape =(X_train.shape[-1],))
         x = attention(mechanism="scaled_dot",bias = False)(inputs)
         x = LinearGO(256, zeroes= go, activation ="tanh")(x)
@@ -336,19 +338,11 @@ for i in range(n):
                                                          preds.argmax(axis=1), average='weighted')
         results.loc[i, "Weighted F1 score"] = f1_score(y_test_enc.argmax(axis=1), 
                                                        preds.argmax(axis=1), average='weighted')
-        #results.loc[i, "c_ind_red"] =concordance_index(c[n_inf:(n_inf+n_red)],
-        #                                               model.feature_importances_[n_inf:(n_inf+n_red)])
+
         
         attn =model_go.layers[1].weights[1].numpy()
         attn = np.abs(attn).flatten().tolist()
         
-        results.loc[i, "c_index"] =concordance_index(c, attn)
-        results.loc[i, "c_ind_inf"] =concordance_index(c[:n_inf], attn[:n_inf])
-        
-        
-        results.loc[i, "c_ind_Ninf"] =concordance_index(c[n_inf:], 
-                                                       attn[n_inf:])
-        results.loc[i, "c_ratio"] =np.sum(attn[:n_inf]) / np.sum(attn[n_inf:])
         feat_imp.loc[:,i] = attn
     
     
