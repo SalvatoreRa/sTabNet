@@ -62,7 +62,10 @@ for p in sep_diff:
     # CREATE DATASET AND FEATURE IMPORTANCE
     class_sep = p
     # create classification dataset, function from scikit-learn
-    #dataset with 1000 examples,10 informative features and 90 non-informative
+    # dataset with 1000 examples,10 informative features and 90 non-informative
+    # 6 classes
+    # p is hyperprarameter controlling separation between classes
+    # lower p more difficult classification task
     X, y = make_classification(
         n_samples=1000,
         n_features=n_feat,
@@ -84,15 +87,7 @@ for p in sep_diff:
     
     
 
-
-    clf = LogisticRegression(random_state=0).fit(X.iloc[:,:n_inf], y)
-    c_inf = np.sum(np.abs(clf.coef_), axis=0)
-    c_inf = NormalizeData(c_inf) +10
-    clf = LogisticRegression(random_state=0).fit(X.iloc[:,n_inf:], y)
-    c_noise = np.sum(np.abs(clf.coef_), axis=0)
-    c_noise = NormalizeData(c_noise)
-    c =list(c_inf) + list(c_noise)
-    
+    #100 different split of the dataset
     for i in range(n):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, 
                                                                 random_state=i, stratify = y)
@@ -106,12 +101,13 @@ for p in sep_diff:
         X_test = scaler.transform(X_test)
 
 
-            #y_val[:5], y_val_enc[:5], y_train[:5],  y_train_enc[:5]
-
+            
+	#training of a XGB classifier for multi-task objective
         model = xgb.XGBClassifier(objective='multi:softmax', random_state=i)
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
-
+	
+	# recording of different evaluation metrics for the model
         results.loc[i, "Accuracy"] = accuracy_score(y_test, y_pred)
         results.loc[i, "Micro precision"] = precision_score(y_test, y_pred, average='micro')
         results.loc[i, "Micro recall"] = recall_score(y_test, y_pred, average='micro')
@@ -122,13 +118,8 @@ for p in sep_diff:
         results.loc[i, "Weighted precision"] = precision_score(y_test, y_pred, average='weighted')
         results.loc[i, "Weighted recall"] = recall_score(y_test, y_pred, average='weighted')
         results.loc[i, "Weighted F1 score"] = f1_score(y_test, y_pred, average='weighted')
-        results.loc[i, "c_index"] =concordance_index(c, model.feature_importances_)
-        results.loc[i, "c_ind_inf"] =concordance_index(c[:n_inf], model.feature_importances_[:n_inf])
-        #results.loc[i, "c_ind_red"] =concordance_index(c[n_inf:(n_inf+n_red)],
-        #                                               model.feature_importances_[n_inf:(n_inf+n_red)])
-        results.loc[i, "c_ind_Ninf"] =concordance_index(c[n_inf:], 
-                                                       model.feature_importances_[n_inf:])
-        results.loc[i, "c_ratio"] =np.sum(model.feature_importances_[:n_inf]) / np.sum(model.feature_importances_[n_inf:])
+        
+        #storing feature importance for of the model 
         feat_imp.loc[:,i] = model.feature_importances_
         
     res_dir = './results/'
@@ -137,6 +128,8 @@ for p in sep_diff:
     feat_imp.to_csv(res_dir+ 'feat_imp_XGBoost_inf+' + str(p) +'.csv')
         
     feat_imp['col_feat'] = feat_imp.index
+    
+    #lineplot of the feature importance for each separate separation coefficient
     feats = feat_imp.melt('col_feat',  var_name='splits', value_name='feat_imp')
     sns_plot =sns.lineplot(data=feats, x="col_feat", y="feat_imp")
     sns_plot.figure.savefig(res_dir+ 'feat_plot_inf+' + str(p) +'.png')
