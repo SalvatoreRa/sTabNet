@@ -31,6 +31,17 @@ def NormalizeData(data):
 import sys  
 sys.path.insert(0, "/home/sraieli/py_script/pnet/")
 
+'''
+we are importing some function to make the code quicker
+linearGO is a defined layer that is enforcing sparsity,
+classical linear layer: XW + B, where W is a matrix and B the bias
+LinearGO: X (W @ A) + B, where A is a binary matrix (0/1) controlling
+	the connections, thus there is a weight between a neuron only if there is
+	a definition in A. @ is the hadamard product. the layer is implemented using
+	sparse matrix multiplication to be more efficient
+
+'''
+
 import toy_datasets, tf_layer, tools, matrixes
 from tools import keras_cat, history_plot, splitting_data
 from tf_layer import LinearGO 
