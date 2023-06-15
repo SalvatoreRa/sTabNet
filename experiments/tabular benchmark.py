@@ -172,16 +172,7 @@ for j in range(benchmark.shape[0]):
     data = df.drop([target], axis=1) #discarding ID
     y=  df[target] 
 
-    n = np.linalg.norm(data, axis=0).reshape(1, data.shape[1])
-    cosine_mat= data.T.dot(data) / n.T.dot(n)
-    cosine_mat =np.where(cosine_mat> .5, 1, np.where(cosine_mat <-0.5, 1, 0))
-    np.fill_diagonal(cosine_mat, 0)
-
-    G = nx.Graph(cosine_mat)
-
-
-    random_walks =get_paths(G, rws= 3, steps= 5)
-    go = mapping_rw(rws=random_walks, features=data.columns.to_list())
+    
 
 
     n= 10
@@ -191,6 +182,18 @@ for j in range(benchmark.shape[0]):
                                                                                     val_split = 0.1, 
                                                                                     test_split = 0.2,
                                                                                     random_seed =i)
+                                                                                    
+        nx = np.linalg.norm(X_train, axis=0).reshape(1, X_train.shape[1])
+	cosine_mat= X_train.T.dot(X_train) / nx.T.dot(nx)
+	cosine_mat =np.where(cosine_mat> .5, 1, np.where(cosine_mat <-0.5, 1, 0))
+	np.fill_diagonal(cosine_mat, 0)
+
+	G = nx.Graph(cosine_mat)
+
+
+	random_walks =get_paths(G, rws= 3, steps= 5)
+	go = mapping_rw(rws=random_walks, 	features=data.columns.to_list())                                                                            
+                                                                                    
         alg_type ='sparse_net'
         tf.keras.backend.clear_session()
 
@@ -211,42 +214,7 @@ for j in range(benchmark.shape[0]):
         m =m + [alg_type, dataset_name, dataset_class]
         results.loc[len(results)] = m
 
-        alg_type ='FFNN_att'
-        tf.keras.backend.clear_session()
-        inputs = keras.layers.Input(shape =(X_train.shape[-1],))
-        x = attention(mechanism="scaled_dot")(inputs)
-        x = keras.layers.Dense(k, activation ="relu")(x)
-        x = keras.layers.Dense(64, activation ="relu")(x)
-        x = keras.layers.Dropout(rate=0.5)(x)
-        x = keras.layers.Dense(y_train_enc.shape[1], activation ="sigmoid")(x)
-        model_go = keras.models.Model(inputs, x)
-        model_go.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        history = model_go.fit(X_train, y_train_enc,batch_size=batch_size,
-            epochs=epochs, verbose=0, validation_data=(X_val, y_val_enc),
-        )
 
-        m= classification_metrics(_X_test = X_test, _model = model_go, 
-                                 _y_test = y_test_enc, nn= True)
-        m =m + [alg_type, dataset_name, dataset_class]
-        results.loc[len(results)] = m
-
-        alg_type ='FFNN'
-        tf.keras.backend.clear_session()
-        inputs = keras.layers.Input(shape =(X_train.shape[-1],))
-        x = keras.layers.Dense(k, activation ="relu")(inputs)
-        x = keras.layers.Dense(64, activation ="relu")(x)
-        x = keras.layers.Dropout(rate=0.5)(x)
-        x = keras.layers.Dense(y_train_enc.shape[1], activation ="sigmoid")(x)
-        model_go = keras.models.Model(inputs, x)
-        model_go.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        history = model_go.fit(X_train, y_train_enc,batch_size=batch_size,
-            epochs=epochs, verbose=0, validation_data=(X_val, y_val_enc),
-        )
-
-        m= classification_metrics(_X_test = X_test, _model = model_go, 
-                                 _y_test = y_test_enc, nn= True)
-        m =m + [alg_type, dataset_name,dataset_class]
-        results.loc[len(results)] = m
 
 
     for i in range(n):
@@ -280,14 +248,7 @@ for j in range(benchmark.shape[0]):
         m =m + [alg_type, dataset_name, dataset_class]
         results.loc[len(results)] = m
         
-                #XGBoost
-        alg_type ='random_forest'
-        model = RandomForestClassifier(random_state=i)
-        model.fit(X_train, y_train)
-        m= classification_metrics(_X_test = X_test, _model = model, 
-                                 _y_test = y_test, nn= False)
-        m =m + [alg_type, dataset_name, dataset_class]
-        results.loc[len(results)] = m
+
 
 print("--- %s seconds ---" % (time.time() - start_time))
 res_dir= './results/'
