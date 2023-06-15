@@ -300,12 +300,20 @@ sep_diff = np.round(np.linspace(0.1, 0.9, num=9),1)
 
 for p in sep_diff:
     
-    # CREATE DATASET AND FEATURE IMPORTANCE
+    # CREATE DATASET
+    '''
+    dataset is generated as for XGBoost experiment
+    X is a tabular dataset with 10 important features and 90 non informative features
+    1000 total examples 
+    We have heare a matrix A, which is a binary matrix that is controlling the interaction
+    between features in the sparse layers
+    p here is a hyperparameter, lower p more is difficult the classification task
+    '''
     class_sep = p
     
-    X, y, c, go = constrain_dataset(_n_samples=1000, n_feat=100,n_inf=10,n_red=0, n_rep=0, 
+    X, y, c, A = constrain_dataset(_n_samples=1000, n_feat=100,n_inf=10,n_red=0, n_rep=0, 
                                     n_clas =6, class_sepr=p,seed=42, criterion = 'type_1', 
-                                    pathways= 100, pathway_inf = 0.9, pathway_red = 0.3)
+                                    pathways= 100, pathway_inf = 0.5, pathway_red = 0.3)
     
     
     for i in range(n):
@@ -317,7 +325,7 @@ for p in sep_diff:
 
         inputs = keras.layers.Input(shape =(X_train.shape[-1],))
         x = attention(mechanism="scaled_dot",bias = False)(inputs)
-        x = LinearGO(256, zeroes= go, activation ="tanh")(x)
+        x = LinearGO(256, zeroes= A, activation ="tanh")(x)
         x = keras.layers.Dropout(rate=0.5)(x)
         x = keras.layers.Dense(64, activation ="relu")(x)
         x = keras.layers.Dropout(rate=0.3)(x)
