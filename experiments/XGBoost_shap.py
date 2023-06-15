@@ -86,6 +86,8 @@ for p in sep_diff:
 
     #100 splits for each separation coefficient p
     for i in range(n):
+        # we are splitting the dataset in training, validation and test set: 70-10-20
+    	#this for comparing with neural networks where we use the validation
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, 
                                                                 random_state=i, stratify = y)
         X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.10, 
@@ -99,7 +101,7 @@ for p in sep_diff:
 
 
             
-
+	#training the XGB classifier
         model = xgb.XGBClassifier(objective='multi:softmax', random_state=i)
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
