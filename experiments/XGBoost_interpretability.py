@@ -44,9 +44,10 @@ n_classes=6
 class_sep = 0.1
 #number repetition
 n = 100
+# dataframe to save results
 split_i = np.array(range(n) )
 results = pd.DataFrame(index = split_i, columns = measures)
-
+# dataframe to save the importance score for the features
 N_feat = np.array(range(n_feat) )
 feat_imp = pd.DataFrame(index = N_feat, columns = split_i)
 
