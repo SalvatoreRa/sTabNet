@@ -346,7 +346,8 @@ for p in sep_diff:
         )
 
         preds = model_go.predict(X_test)
-
+	
+	#saving the results and the perfomance
         results.loc[i, "Accuracy"] = accuracy_score(y_test_enc.argmax(axis=1), preds.argmax(axis=1))
         results.loc[i, "Micro precision"] = precision_score(y_test_enc.argmax(axis=1), 
                                                             preds.argmax(axis=1), average='micro')
