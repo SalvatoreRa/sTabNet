@@ -136,6 +136,23 @@ def mapping_rw(rws=None, features=None):
 
 ##### classification benchmark
 
+'''
+we are using the classification benchmark
+link: https://huggingface.co/datasets/inria-soda/tabular-benchmark
+link to the article: https://arxiv.org/abs/2207.08815
+we selected all the classification datasets that have more than 20 features
+and less than 100 k examples
+
+for the sparse net:
+to generate the matrix A, we create first a cosine similarity matrix of the features, 
+where the similarity is higher than 0.5 or less than -0.5 the matrix  is 1 otherwise 0
+we treated the matrix  as the adjacency matrix of the graph G (graph of the features).
+On the graph G we apply the node3vec algorithm to obtain for each node (or dataset feature)
+three random walk  of size five (5 steps)
+the matrix A is then a matrix of size n (number of features) for 3n (3 random walk for each node)
+
+'''
+
 n = 10
 start_time = time.time()
 
