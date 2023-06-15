@@ -285,7 +285,7 @@ iterations = 10
 
 results = pd.DataFrame(index = split_i, columns = measures)
 
-X, y, c, go = constrain_dataset(_n_samples=1000, n_feat=100,n_inf=10,n_red=0, n_rep=0, 
+X, y, c, A = constrain_dataset(_n_samples=1000, n_feat=100,n_inf=10,n_red=0, n_rep=0, 
                                 n_clas =6, class_sepr=0.9,seed=42, criterion = 'type_1', 
                                 pathways= 100, pathway_inf = 0.5, pathway_red = 0.3)
 
@@ -394,9 +394,9 @@ for f in range(90):
         
         pathway_inf = int(pathways * pathway_inf)
 
-        go =np.random.randint(1, size=(X.shape[1], pathways))
-        go[:n_inf, :pathway_inf] = np.random.randint(2, size=(n_inf, pathway_inf))
-        go[n_inf:, pathway_inf:] = np.random.randint(2, size=((X.shape[1]-n_inf), 
+        A =np.random.randint(1, size=(X.shape[1], pathways))
+        A[:n_inf, :pathway_inf] = np.random.randint(2, size=(n_inf, pathway_inf))
+        A[n_inf:, pathway_inf:] = np.random.randint(2, size=((X.shape[1]-n_inf), 
                                                                    (pathways-pathway_inf) ))
     
         for i in range(n,m):
@@ -407,7 +407,7 @@ for f in range(90):
 
             inputs = keras.layers.Input(shape =(X_train.shape[-1],))
             x = attention(mechanism="scaled_dot",bias = False)(inputs)
-            x = LinearGO(256, zeroes= go, activation ="tanh")(x)
+            x = LinearGO(256, zeroes= A, activation ="tanh")(x)
             x = keras.layers.Dropout(rate=0.5)(x)
             x = keras.layers.Dense(64, activation ="relu")(x)
             x = keras.layers.Dropout(rate=0.3)(x)
