@@ -150,7 +150,14 @@ we treated the matrix  as the adjacency matrix of the graph G (graph of the feat
 On the graph G we apply the node3vec algorithm to obtain for each node (or dataset feature)
 three random walk  of size five (5 steps)
 the matrix A is then a matrix of size n (number of features) for 3n (3 random walk for each node)
+for each column is the matrix A, if in the random walk is present a node, we add 1 otherwise zero
 
+
+for the benchmark dataset
+For each dataset, we split in training, validation and test set and we measure the accuracy
+
+XGBoost and logistic regression
+we followed the official implementation
 '''
 
 n = 10
