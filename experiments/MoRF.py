@@ -262,6 +262,18 @@ def constrain_dataset(_n_samples=1000, n_feat=100,n_inf=10,n_red=0, n_rep=0, n_c
 
 print('starting executing script')
 
+'''
+MoRF analysis 
+
+Here, we are progressively removing features according to their feature
+importance, we are removing features starting from the most important
+XGBoost:
+according to feature importance, as extracted by the model
+sparsenet:
+according to the attention weight given to each feature
+
+
+'''
 
 ### XGBoost
 
