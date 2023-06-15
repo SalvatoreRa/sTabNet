@@ -262,6 +262,11 @@ def constrain_dataset(_n_samples=1000, n_feat=100,n_inf=10,n_red=0, n_rep=0, n_c
 
 print('starting executing script')
 
+'''
+we are generating a dataset with low separation between the classes, this is a
+more difficult classification tasks. Here, we are just training longer the
+sparse net, the settings is the same for the other model
+''
 
 
 start_time = time.time()
