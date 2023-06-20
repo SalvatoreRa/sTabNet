@@ -99,6 +99,10 @@ n = 100
 split_i = np.array(range(n) )
 results = pd.DataFrame(index = split_i, columns = measures)
 
+'''
+For CNN input are reshaped as an 2d -array
+
+'''
 
 for i in range(n):
     X_train, X_test, X_val, y_train_enc, y_val_enc, y_test_enc =splitting_data( data_x = concat, 
