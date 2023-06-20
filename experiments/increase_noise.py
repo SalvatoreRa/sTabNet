@@ -368,19 +368,12 @@ for p in sep_diff:
                                                              preds.argmax(axis=1), average='weighted')
             results.loc[i, "Weighted F1 score"] = f1_score(y_test_enc.argmax(axis=1), 
                                                            preds.argmax(axis=1), average='weighted')
-            #results.loc[i, "c_ind_red"] =concordance_index(c[n_inf:(n_inf+n_red)],
-            #                                               model.feature_importances_[n_inf:(n_inf+n_red)])
+            
 
             attn =model_go.layers[1].weights[1].numpy()
             attn = np.abs(attn).flatten().tolist()
 
-            results.loc[i, "c_index"] =concordance_index(c, attn)
-            results.loc[i, "c_ind_inf"] =concordance_index(c[:n_inf], attn[:n_inf])
-
-
-            results.loc[i, "c_ind_Ninf"] =concordance_index(c[n_inf:], 
-                                                           attn[n_inf:])
-            results.loc[i, "c_ratio"] =np.sum(attn[:n_inf]) / np.sum(attn[n_inf:])
+            
             
 
             attn =model_go.layers[1].weights[1].numpy()
@@ -476,12 +469,7 @@ for p in sep_diff:
             results.loc[i, "Weighted recall"] = recall_score(y_test, y_pred, average='weighted')
             results.loc[i, "Weighted F1 score"] = f1_score(y_test, y_pred, average='weighted')
             results.loc[i, "c_index"] =concordance_index(c, model.feature_importances_)
-            results.loc[i, "c_ind_inf"] =concordance_index(c[:n_inf], model.feature_importances_[:n_inf])
-            #results.loc[i, "c_ind_red"] =concordance_index(c[n_inf:(n_inf+n_red)],
-            #                                               model.feature_importances_[n_inf:(n_inf+n_red)])
-            results.loc[i, "c_ind_Ninf"] =concordance_index(c[n_inf:], 
-                                                           model.feature_importances_[n_inf:])
-            results.loc[i, "c_ratio"] =np.sum(model.feature_importances_[:n_inf]) / np.sum(model.feature_importances_[n_inf:])
+            
             feat_imp = model.feature_importances_
 
             results.loc[i, "mean_inf"] = np.mean(feat_imp[:n_inf])
