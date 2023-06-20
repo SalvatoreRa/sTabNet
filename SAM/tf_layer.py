@@ -2,8 +2,6 @@ import pandas as pd
 import numpy as np
 from tensorflow import keras
 import tensorflow as tf
-import matplotlib.pyplot as plt
-import seaborn as sns
 from tensorflow.keras import activations, constraints, regularizers
 import tensorflow.keras as keras
 
