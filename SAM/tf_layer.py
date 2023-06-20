@@ -123,15 +123,20 @@ class attention(keras.layers.Layer):
         super(attention,self).__init__(**kwargs)
         self.bias = bias
         self.mechanism = mechanism
+        #self.alpha = tf.ones(1, dtype=tf.dtypes.float32)
+        
  
     def build(self,input_shape):
         
-        self.W=self.add_weight(name='attention_weight', shape=(input_shape[-1],1), 
+        self.W=self.add_weight(name='multipl_weight', shape=(input_shape[-1],1), 
                                initializer='glorot_uniform', trainable=True)
         if self.bias:
             self.b=self.add_weight(name='attention_bias', shape=(input_shape[1],), 
-                               initializer='glorot_uniform', trainable=True)        
+                               initializer='glorot_uniform', trainable=True)  
+        self.alpha = self.add_weight(name='attention_weight', shape=(input_shape[-1],), 
+                               initializer='glorot_uniform', trainable=True)
         super(attention, self).build(input_shape)
+        
  
     def call(self,x):
         # Alignment scores. Pass them through tanh function
@@ -141,44 +146,44 @@ class attention(keras.layers.Layer):
                 e = tf.tanh(tf.matmul(x,self.W +self.b))
             else:
                 e = tf.tanh(tf.matmul(x,self.W ))
-            alpha = tf.nn.softmax(e)
+            alpha = tf.nn.softmax(e) * self.alpha
             
         if self.mechanism=="Luong":        
             if self.bias:
                 e = tf.matmul(x,self.W +self.b)
             else:
                 e = tf.matmul(x,self.W )
-            alpha = tf.nn.softmax(e)
+            alpha = tf.nn.softmax(e) * self.alpha
             
         if self.mechanism=="Graves":        
             if self.bias:
                 e = tf.math.cos(tf.matmul(x,self.W +self.b))
             else:
                 e = tf.math.cos(tf.matmul(x,self.W ))
-            alpha = tf.nn.softmax(e)
+            alpha = tf.nn.softmax(e) * self.alpha
             
         if self.mechanism=="scaled_dot":        
             if self.bias:
                 e = tf.matmul(x,self.W +self.b)
             else:
-                e = tf.matmul(x,self.W )
+                e = tf.matmul(x,self.W ) 
             
             scaling_factor = tf.math.rsqrt(tf.convert_to_tensor((x.shape[-1]),
                                                                 dtype=tf.float32 ))
             e = tf.multiply(e,scaling_factor )
-            alpha = tf.nn.softmax(e)
+            alpha = tf.nn.softmax(e) * self.alpha
         
         if self.mechanism=="exp1":        
             if self.bias:
                 e = tf.matmul(x,self.W +self.b)
             else:
-                e = tf.matmul(x,self.W )
+                e = tf.matmul(x,self.W ) 
             
             scaling_factor = tf.math.rsqrt(tf.convert_to_tensor((x.shape[-1]),
                                                                 dtype=tf.float32 ))
             e = tf.keras.activations.swish(e)
             e = tf.multiply(e,scaling_factor )
-            alpha = tf.nn.softmax(e)
+            alpha  = tf.nn.softmax(e) * self.alpha
             
         
         x = x * alpha
