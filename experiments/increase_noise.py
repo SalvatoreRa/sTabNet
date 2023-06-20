@@ -295,7 +295,12 @@ feat_imp = pd.DataFrame(index = N_feat, columns = split_i)
 
 sep_diff = np.round(np.linspace(0.1, 0.9, num=9),1)
 
-
+'''
+Here we are progressively increasing the number of noise features
+the informative features are kept the same number (n =10)
+starting from 90 noise features (90 +10 informative, total n
+features 100) up to 790 (total features 800)
+'''
 for p in sep_diff:
     
     # CREATE DATASET AND FEATURE IMPORTANCE
@@ -307,7 +312,7 @@ for p in sep_diff:
     for f in n_features:
         X, y, c, go = constrain_dataset(_n_samples=1000, n_feat=f,n_inf=10,n_red=0, n_rep=0, 
                                     n_clas =6, class_sepr=p,seed=42, criterion = 'type_1', 
-                                    pathways= 100, pathway_inf = 0.9, pathway_red = 0.3)
+                                    pathways= 100, pathway_inf = 0.5, pathway_red = 0.3)
         if p <=0.4:
             epochs=2000
         else:
