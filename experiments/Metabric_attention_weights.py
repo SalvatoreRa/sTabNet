@@ -57,7 +57,7 @@ df1 = df1.transpose()
 df1 = df1.sort_index()
 clin = pd.read_table("/home/sraieli/analysis/brca_metabric/data_clinical_patient.txt", skiprows = 4)
 
-
+clin1 = clin.sort_values(by = ["PATIENT_ID"])
 samples = df1.index.tolist()
 clin1 = clin1[clin1['PATIENT_ID'].isin(samples)]
 clin1 = clin1[clin1['CLAUDIN_SUBTYPE']!= "NC"] #there only 6 examples
