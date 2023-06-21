@@ -57,7 +57,7 @@ df1 = df1.drop(["Hugo_Symbol"], axis = 1)
 df1 = df1.transpose()
 df1 = df1.sort_index()
 clin = pd.read_table("/home/sraieli/analysis/brca_metabric/data_clinical_patient.txt", skiprows = 4)
-#for binary classification
+
 clin1 = clin.sort_values(by = ["PATIENT_ID"])
 
 samples = df1.index.tolist()
@@ -90,7 +90,7 @@ concat, adj_gene, go2= concat_go_matrix(expr = df3, exo_df = cna2, gene_pats =go
 
 ### test activation functions
 
-%%capture
+
 start_time = time.time()
 measures = [ 'Accuracy', 'Micro precision', 'Micro recall', 'Micro F1 score',
         'Macro precision', 'Macro recall', 'Macro F1 score',
