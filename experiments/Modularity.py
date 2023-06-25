@@ -56,10 +56,31 @@ import numpy as np
 import networkx as nx
 def random_walk(graph:nx.Graph, node:int, steps:int = 4, p:float=1.0, q:float=1.0):
    """  
-   perform a Node2vec random walk for a node in a graph 
-   p: return parameter, control the likelihood to revisit a node. low value keep local
+   perform a Node2vec random walk for a node in a graph.
+   Node2vec random walk is an extension of the random walk, where parameter p and q controls the 
+   exploration of local versus a more wide esploration (Breath first versus deep first search)
+   code adapted from: https://keras.io/examples/graph/node2vec_movielens/
+   
+   Parameter
+   graph: networkx graph
+   p: return parameter, control the likelihood to visit again a node. low value keep local
    q: in-out parameter, inward/outwards node balance; high value local, low value exploration
+   node = node in the networkx graph to start the randomwalk
+   steps: number of steps
+   Return:
+   rw: random walk
+   
+   notes:
+   this code works also with isolate nodes, for isolates node, return a random walk of 1, where
+   the isolate node is the only node present
+   
+   example usage:
+   rw = random_walk(graph, node, steps, p, q)
+   rw = random_walk(G, 0, 4, 1.0, 1.0)
+      
+   
    """
+
    if nx.is_isolate(G, node):
         rw = [str(node)]
    else:
@@ -89,7 +110,19 @@ def random_walk(graph:nx.Graph, node:int, steps:int = 4, p:float=1.0, q:float=1.
 
 def get_paths(graph:nx.Graph, rws= 10, steps = 4, p=1.0, q=1.0):
    """  
-   perform a set of random walks ina graph
+   perform a set of random walks in a networkx graph
+   this function is a simple wrapper to perform a set of random walks in a graph
+   
+   parameters:
+   graph: a networkx graph
+   rws: number of randomwalks performed for each node (ex: 5, five random walk starting from each node
+   will be performed)
+   steps: number of steps (visited node) for each random walks
+   p: return parameter, control the likelihood to visit again a node. low value keep local
+   q: in-out parameter, inward/outwards node balance; high value local, low value exploration
+   return:
+   a list of random walks
+   
    """
    paths = []
    for node in graph.nodes():
