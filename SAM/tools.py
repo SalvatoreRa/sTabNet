@@ -229,13 +229,19 @@ def classification_metrics(_X_test = None, _model = None, _y_test = None, nn= Tr
     '''
     simple wrapper for getting all the classification metrics
     used for binary classsification
+    
+    ----
     Parameters:
+    input
     - test set, panda dataframe or numpy array
     - model, a trained model
     - y_test, the target variable,  panda series or numpy array or a list
     -nn, bool, if it is a neural network or scikit-learn like algorithm
-    return
+    
+    ----
+    Output
     - a list of classification metrics result
+    
     ---
     example of usage:
     classification_metrics(_X_test = X_test, _model = model_go, _y_test = y_test_enc, nn= True)
