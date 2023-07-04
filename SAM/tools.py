@@ -334,8 +334,13 @@ def get_paths(graph:nx.Graph, rws= 10, steps = 4, p=1.0, q=1.0):
    steps: number of steps (visited node) for each random walks
    p: return parameter, control the likelihood to visit again a node. low value keep local
    q: in-out parameter, inward/outwards node balance; high value local, low value exploration
+   
    return:
    a list of random walks
+   
+   
+   example usage:
+   random_walks =get_paths(G, rws= 1, steps= 5)
    
    """
    paths = []
