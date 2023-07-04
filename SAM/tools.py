@@ -381,5 +381,49 @@ def mapping_rw(rws=None, features=None):
         for j in rw:
             A.loc[features[j],i] = 1
     return A
+    
+def generate_feature_graph(data:pd.DataFrame, metric:str='cosine', score:float=0.5):
+    
+    '''
+    generate a feature graph from a pandas data frame.
+    starting from the data matrix or a numpy array a similarity matrix (using a metric)
+    is calculated if the similarity is higher than a certain value (score)
+    
+    ----
+    Parameters
+    Input
+    -data: pandas data frame or numpy array
+    -metric: a metric you use to generate the similarity matrix, option are:
+        'cosine'. 'cosine' is the defaul
+        cosine: cosine similarity, cosine similarity is calculated.
+        correlation: pearson correlation
+    
+    optional arguments
+    -score: 0.5 is default, value of similarity for defining an edge
+    
+    ----
+    output
+    return a feature graph (networkx graph) which can contains isolated nodes
+    
+    ----
+    example usage
+    G =generate_feature_graph(data)
+    G =generate_feature_graph(data, metric ='correlation')
+    G =generate_feature_graph(data, metric ='correlation')
+    G =generate_feature_graph(data, metric ='correlation', score= 0.7)
+    
+    '''
+    if metric =='cosine':
+        n = np.linalg.norm(data, axis=0).reshape(1, data.shape[1])
+        dist_matrix= data.T.dot(data) / n.T.dot(n)
+        dist_matrix =np.where(dist_matrix> score, 1, np.where(dist_matrix <-score, 1, 0))
+        np.fill_diagonal(dist_matrix, 0)
+    if metric =='correlation':
+        dist_matrix =np.corrcoef(data, rowvar= False)
+        dist_matrix =np.where(dist_matrix> score, 1, np.where(dist_matrix <-score, 1, 0))
+        np.fill_diagonal(dist_matrix, 0)
+        
+    G = nx.Graph(dist_matrix)
+    return G
 
 
