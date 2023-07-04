@@ -394,7 +394,7 @@ def generate_feature_graph(data:pd.DataFrame, metric:str='cosine', score:float=0
     Input
     -data: pandas data frame or numpy array
     -metric: a metric you use to generate the similarity matrix, option are:
-        'cosine'. 'cosine' is the defaul
+        'cosine', 'correlation'. 'cosine' is the defaul
         cosine: cosine similarity, cosine similarity is calculated.
         correlation: pearson correlation
     
