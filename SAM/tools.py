@@ -293,6 +293,7 @@ def random_walk(graph:nx.Graph, node:int, steps:int = 4, p:float=1.0, q:float=1.
    this code works also with isolate nodes, for isolates node, return a random walk of 1, where
    the isolate node is the only node present
    
+   ----
    example usage:
    rw = random_walk(graph, node, steps, p, q)
    rw = random_walk(G, 0, 4, 1.0, 1.0)
