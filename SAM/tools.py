@@ -351,11 +351,14 @@ def get_paths(graph:nx.Graph, rws= 10, steps = 4, p=1.0, q=1.0):
 
 def mapping_rw(rws=None, features=None):
     """mapping clustering labels to a membership matrix
+    
     input
     rws = a list of random walks (as list of list
     features = list of original features
+    
     output
     a panda dataframe where each feature is mapped to the cluster it belongs
+   
     example usage:
     go = mapping_rw(rws=random_walks, features=data.columns.to_list())
     """
