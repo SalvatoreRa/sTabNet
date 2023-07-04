@@ -275,15 +275,20 @@ def random_walk(graph:nx.Graph, node:int, steps:int = 4, p:float=1.0, q:float=1.
    exploration of local versus a more wide esploration (Breath first versus deep first search)
    code adapted from: https://keras.io/examples/graph/node2vec_movielens/
    
+   ----
    Parameter
+   input
    graph: networkx graph
    p: return parameter, control the likelihood to visit again a node. low value keep local
    q: in-out parameter, inward/outwards node balance; high value local, low value exploration
    node = node in the networkx graph to start the randomwalk
    steps: number of steps
+   
+   ----
    Return:
    rw: random walk
    
+   ----
    notes:
    this code works also with isolate nodes, for isolates node, return a random walk of 1, where
    the isolate node is the only node present
