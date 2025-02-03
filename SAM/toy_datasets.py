@@ -252,3 +252,5 @@ def make_class_dataset(_n_samples=1000, n_feat=100,n_inf=10,n_red=0, n_rep=0, n_
     
     return X, y, c, _go
       
+
+
