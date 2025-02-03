@@ -125,3 +125,5 @@ def concat_go_matrix(expr = None, exo_df = None, gene_pats =None, filt_mats = No
 
     _concat, _adj_gene = concat_omics(_X = expr, _mut = exo_df, sort = True)
     return _concat, _adj_gene, gene_pats
+
+
