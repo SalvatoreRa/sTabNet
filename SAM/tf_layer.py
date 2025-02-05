@@ -113,9 +113,9 @@ class attention(keras.layers.Layer):
     mechanism="Luong", define the luong
     echanism="scaled_dot", define the luong but scaled for number of features
     mechanism ="Graves", defined as Graves
-    mechanism ="exp1", dexperimental
+    
     Bias= True, default, if you want Bias weight addition
-    in P-net bias are not advised
+
     """
     def __init__(self, bias= True, mechanism="Bahdanau", **kwargs):
         super(attention,self).__init__(**kwargs)
@@ -171,17 +171,7 @@ class attention(keras.layers.Layer):
             e = tf.multiply(e,scaling_factor )
             alpha = tf.nn.softmax(e) * self.alpha
         
-        if self.mechanism=="exp1":        
-            if self.bias:
-                e = tf.matmul(x,self.W +self.b)
-            else:
-                e = tf.matmul(x,self.W ) 
-            
-            scaling_factor = tf.math.rsqrt(tf.convert_to_tensor((x.shape[-1]),
-                                                                dtype=tf.float32 ))
-            e = tf.keras.activations.swish(e)
-            e = tf.multiply(e,scaling_factor )
-            alpha  = tf.nn.softmax(e) * self.alpha
+       
             
         
         x = x * alpha
