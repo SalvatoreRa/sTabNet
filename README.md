@@ -26,3 +26,33 @@ preprint is available [here](https://arxiv.org/abs/2410.17758)
 * [TCGA Breast](https://www.cbioportal.org/study/summary?id=brca_tcga_pan_can_atlas_2018)
 * [TCGA lung](https://www.cbioportal.org/study/summary?id=luad_tcga_gdc)
 * [TISCH single cell](https://tisch.comp-genomics.org/)
+
+## Synthetic data
+
+We used [make_classification](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html) from scikit-learn to create the synthetic data
+```python 
+from sklearn.datasets import make_classification
+
+n_feat =100
+n_inf = 10
+n_red =0
+n_rep=0
+n_classes=6
+class_sep = 0.1
+X, y = make_classification(
+    n_samples=1000,
+    n_features=n_feat,
+    n_informative=n_inf,
+    n_redundant=n_red,
+    n_repeated=0,
+    n_classes=n_classes,
+    n_clusters_per_class=1,
+    class_sep= class_sep,
+    random_state=0,
+    shuffle = False,
+)
+col_names =['col_' + str(i) for i in range(n_feat) ]
+X = pd.DataFrame(X, columns= col_names)
+
+```
+
