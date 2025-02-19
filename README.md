@@ -8,7 +8,7 @@ preprint is available [here](https://arxiv.org/abs/2410.17758)
 
 ## How to cite
 
-'''
+```
 @misc{raieli2024escapingforestsparseinterpretable,
       title={Escaping the Forest: Sparse Interpretable Neural Networks for Tabular Data}, 
       author={Salvatore Raieli and Abdulrahman Altahhan and Nathalie Jeanray and Stéphane Gerart and Sebastien Vachenc},
@@ -18,7 +18,7 @@ preprint is available [here](https://arxiv.org/abs/2410.17758)
       primaryClass={cs.LG},
       url={https://arxiv.org/abs/2410.17758}, 
 }
-'''
+```
 
 ## Dataset used in the work
 
